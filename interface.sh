@@ -18,7 +18,8 @@ function send {
 }
 
 function consult {
- echo "TO DO"
+ FILE=$(dialog --clear --title "Select the message you want" --stdout --title "Please choose a message" --fselect /home/enzouille/messages/ 10 50)
+ dialog --title "File" --msgbox "$FILE" 10 50
 }
 
 INPUT=/tmp/menu.sh.$$
