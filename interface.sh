@@ -14,12 +14,15 @@ function send {
  if [ -d $user_home ]
  then
   touch "$user_home/test.txt"
+  gpg -e -r $user test.txt
+  rm test.txt
  fi
 }
 
 function consult {
  FILE=$(dialog --clear --title "Select the message you want" --stdout --title "Please choose a message" --fselect /home/enzouille/messages/ 10 50)
- dialog --title "File" --msgbox "$FILE" 10 50
+ gpg -d test.txt test.txt.gpg
+ dialog --title "File" --msgbox "$(cat $FILE)" 10 50
 }
 
 INPUT=/tmp/menu.sh.$$
