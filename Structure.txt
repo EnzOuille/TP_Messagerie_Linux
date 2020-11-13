@@ -1,0 +1,23 @@
+Un fichier pour la gestion des utilisateurs :
+
+Un fichier pour le cryptage
+
+Un fichier pour les interface graphiques
+
+Un fichier pour le zippage des anciens messages (dernier ordre)
+
+Un fichier pour les permissions
+
+Un fichier pour l'envoi des messages
+
+Scénario 1 : Envoyer un message : 
+- Dialogue à la forme d'un formulaire :
+	- Utilisateur(s)
+	- Sujet
+	- Message
+	- Date mise automatiquement
+- Dossier : clé + fichier
+
+Remarques : 
+- Chaque utilisateur contient un dossier avec tout ses messages
+- Utiliser un select dialog pour choisir le message à ouvrir (Destinataire + Objet + Date)

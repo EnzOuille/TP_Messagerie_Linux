@@ -14,4 +14,6 @@ function userExist {
 	fi
 }
 
-userExist ENZOUILLE
+function currentUser {
+	echo "$(whoami)"
+}
