@@ -21,3 +21,7 @@ Scénario 1 : Envoyer un message :
 Remarques : 
 - Chaque utilisateur contient un dossier avec tout ses messages
 - Utiliser un select dialog pour choisir le message à ouvrir (Destinataire + Objet + Date)
+
+Date 13/11 : 
+Résoudre le problème de l'interface qui ne s'execute pas
+On a fait : tester clé existe, la générer, utilisateur existe, début interface envoiMessage

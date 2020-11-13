@@ -28,7 +28,3 @@ function generateFileForKey {
 function createKey {
 	gpg --batch --generate-key generation
 }
-
-#generateFileForKey
-#createKey
-keyExist
