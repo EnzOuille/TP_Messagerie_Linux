@@ -6,14 +6,15 @@ function getUsers {
 
 function userExist {
 	chaine_minuscule=$(echo "$1" | awk '{ print tolower($0) }')
-	if [[ "$(getUsers)" == *"$chaine_minuscule"* ]]
-	then
-		echo "L'utilisateur est présent"
+	if id "$chaine_minuscule" &>/dev/null; then
+		echo 0
 	else
-		echo "Faute"
+		echo 1
 	fi
 }
 
 function currentUser {
 	echo "$(whoami)"
 }
+
+userExist invite
