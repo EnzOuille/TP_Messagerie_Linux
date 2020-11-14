@@ -28,3 +28,7 @@ function generateFileForKey {
 function createKey {
 	gpg --batch --generate-key generation
 }
+
+function crypter {
+    gpg --armor --encrypt -r "$(currentUser)_messagerie" $1
+}

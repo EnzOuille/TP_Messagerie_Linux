@@ -17,4 +17,16 @@ function currentUser {
 	echo "$(whoami)"
 }
 
-userExist invite
+function getHome {
+	user_home=$(getent passwd $1 | cut -d: -f6)
+	echo "$user_home"
+}
+
+function verifDossier {
+	if [ -d "$1/messages_script_messagerie" ]; then
+		echo 0
+	else
+		echo 1
+		mkdir "$1/messages_script_messagerie"
+	fi
+}

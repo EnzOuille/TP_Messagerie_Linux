@@ -23,20 +23,24 @@ function consult {
 
 function interfaceDepart {
 	INPUT=/tmp/menu.sh.$$
+	ARRET=false
+	while [ $ARRET = "false" ]; do
+		dialog --clear --title "Dialog Test" \
+		--menu "Choix de l'action" 20 100 3 \
+		Send "Send a message" \
+		Consult "Consult your messages" \
+		Exit "Quit the program" 2>"${INPUT}"
 
-dialog --clear --title "Dialog Test" \
---menu "Choix de l'action" 20 100 3 \
-Send "Send a message" \
-Consult "Consult your messages" \
-Exit "Quit the program" 2>"${INPUT}"
+		menuitem=$(<"${INPUT}")
 
-menuitem=$(<"${INPUT}")
-
-case $menuitem in
- Send) send;;
- Consult) consult;;
- Exit) echo "Exiting the program"; break;;
-esac
+		case $menuitem in
+		 Send) interfaceEnvoiMessage;;
+		 Consult) consult;;
+		 Exit) 
+			ARRET=true
+			break;;
+		esac
+	done
 }
 
 function interfaceEnvoiMessage {
@@ -87,7 +91,7 @@ function interfaceEnvoiMessage {
 		testNull=$(verifMessage $utilisateurs $objet $message)
 		testUser=$(verifUsers $utilisateurs)
 	done
-	echo "C'est tout bon"
+	envoyerMessage $utiliateurs $objet $message
 }
 
 function verifMessage {
@@ -109,5 +113,6 @@ function verifUsers {
 			res=0
 		fi
 	done
+	IMF="\n"
 	echo "$res"
 }
