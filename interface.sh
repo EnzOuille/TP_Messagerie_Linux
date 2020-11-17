@@ -1,32 +1,22 @@
 #!/usr/bin/bash
 source users_info.sh
 source envoi.sh
-function send {
- echo "TO DO"
- user=$(dialog --clear --title "Type the target" \
- --inputbox "Enter username" 10 50 3>&1 1>&2 2>&3 3>&-)
- user_home=$(getent passwd $user | cut -d: -f6)
- echo "$user_home"
- if [ -d $user_home ]
- then
-  touch "$user_home/dossier_messagerie_bash/test.txt"
-  gpg -e -r $user test.txt
-  rm test.txt
- fi
-}
+source cryptage.sh
 
 function consult {
 	dossier_courant=$(getMessageFolder)
 	options=()
 	compteur=0
 	files=()
-	for file in $(ls "$dossier_courant"); do
-		#echo "$(cat "$dossier_courant/$file")"
+	IFS=$'\n'
+	all_files=($(ls "$dossier_courant"))
+	for file in ${all_files[*]}; do
 		options+=("$compteur")
 		let compteur++
 		options+=("$(gpg -q --decrypt --armor "$dossier_courant/$file" | jq ".objet")")
 		files+=("$dossier_courant/$file")
 	done
+	IFS=$' '
 	SORTIE=$(dialog --stdout --clear --title "Liste des messages" \
 	--menu "Choix du message" 15 100 10 "${options[@]}")
 	infos_fichier=$(gpg -q --decrypt --armor "${files[$SORTIE]}")
@@ -34,6 +24,15 @@ function consult {
 }
 
 function interfaceDepart {
+	if [ $(keyExist) -ge 1 ]; then
+		echo "Coucou les gens"
+		generateFileForKey
+		createKey
+	fi
+	path="$HOME/messages_script_messagerie"
+	if [ ! -d $path ]; then
+		mkdir "$HOME/messages_script_messagerie"
+	fi
 	INPUT=/tmp/menu.sh.$$
 	ARRET=false
 	while [ $ARRET = "false" ]; do

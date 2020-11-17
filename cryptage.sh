@@ -3,7 +3,7 @@ source users_info.sh
 
 function keyExist {
 	gpg --list-key "$(currentUser)_messagerie" > /dev/null
-	echo $?
+	echo "$?"
 }
 
 function generateFileForKey {
@@ -17,11 +17,11 @@ function generateFileForKey {
      %no-protection
      %commit
      "
-    if [ -f "generation.txt" ]
-    then
-    	rm generation.txt
-    fi
-    echo "$file" > generation
+    #if [ -f "generation" ]
+    #then
+    #	sudo rm generation
+    #fi
+    echo "$file" > nouveau
     echo 0
 }
 
@@ -30,5 +30,5 @@ function createKey {
 }
 
 function crypter {
-    gpg --armor --encrypt -r "$(currentUser)_messagerie" "$1"
+    gpg --armor --encrypt -r "$2_messagerie" "$1"
 }

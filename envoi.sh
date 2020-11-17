@@ -3,18 +3,18 @@ source users_info.sh
 source cryptage.sh
 function envoyerMessage {
 	name="$2.json"
-	jq -n --arg destinataires "$1" --arg objet "$2" --arg message "$3" '{destinataires: "$destinataires", objet: "$objet", message: "$message"}' > "$name"
-	crypter "$name"
-	rm "$name"
+	jq -n --arg destinataires "$1" --arg objet "$2" --arg message "$3" '{destinataires: $destinataires, objet: $objet, message: $message}' > "$name"
 	for user in $1
 	do
+		crypter "$name" "$user"
 		home=$(getHome $user)
 		verifDossier $home
 		sudo cp "$name.asc" "$home/messages_script_messagerie/$name.asc"
 		sudo chmod 700 "$home/messages_script_messagerie/$name.asc"
 		sudo chown -R "$user:$user" "$home/messages_script_messagerie/$name.asc"
+		rm "$name.asc"
 	done
-	rm "$name.asc"
+	rm "$name"
 }
 
 function verifDossier {
