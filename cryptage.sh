@@ -30,5 +30,5 @@ function createKey {
 }
 
 function crypter {
-    gpg --armor --encrypt -r "$(currentUser)_messagerie" $1
+    gpg --armor --encrypt -r "$(currentUser)_messagerie" "$1"
 }

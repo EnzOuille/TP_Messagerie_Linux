@@ -22,11 +22,8 @@ function getHome {
 	echo "$user_home"
 }
 
-function verifDossier {
-	if [ -d "$1/messages_script_messagerie" ]; then
-		echo 0
-	else
-		echo 1
-		mkdir "$1/messages_script_messagerie"
-	fi
+function getMessageFolder {
+	user_home=$(getHome $(currentUser))
+	res="$user_home/messages_script_messagerie"
+	echo "$res"
 }

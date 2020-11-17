@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 source users_info.sh
-
+source envoi.sh
 function send {
  echo "TO DO"
  user=$(dialog --clear --title "Type the target" \
@@ -16,9 +16,21 @@ function send {
 }
 
 function consult {
- FILE=$(dialog --clear --title "Select the message you want" --stdout --title "Please choose a message" --fselect /home/enzouille/messages/ 10 50)
- gpg -d test.txt test.txt.gpg
- dialog --title "File" --msgbox "$(cat $FILE)" 10 50
+	dossier_courant=$(getMessageFolder)
+	options=()
+	compteur=0
+	files=()
+	for file in $(ls "$dossier_courant"); do
+		#echo "$(cat "$dossier_courant/$file")"
+		options+=("$compteur")
+		let compteur++
+		options+=("$(gpg -q --decrypt --armor "$dossier_courant/$file" | jq ".objet")")
+		files+=("$dossier_courant/$file")
+	done
+	SORTIE=$(dialog --stdout --clear --title "Liste des messages" \
+	--menu "Choix du message" 15 100 10 "${options[@]}")
+	infos_fichier=$(gpg -q --decrypt --armor "${files[$SORTIE]}")
+	dialog --clear --msgbox "Destinataires : $(echo "$infos_fichier" | jq ".destinataires") \nObjet : $(echo "$infos_fichier" | jq ".objet") \nMessage : $(echo "$infos_fichier" | jq ".message")" 0 0 
 }
 
 function interfaceDepart {
@@ -53,59 +65,40 @@ function interfaceEnvoiMessage {
 	echo "$testUser testUser"
 	while [ $testNull -ge 1 -o $testUser -ge 1 ]
 	do
-		# open fd
-		exec 3>&1
-
-		# Store data to $VALUES variable
-		VALUES=$(dialog --ok-label "Envoyer" \
+		VALUES=$(dialog --stdout --ok-label "Envoyer" \
 			  --backtitle "$testNull - $testUser" \
 			  --title "Envoyer un message" \
 			  --form "Saisir les champs pour envoyer un message" \
 		15 100 5 \
 			"Destinataires:"         1 1	"" 	1 15 85 500 \
 			"        Objet:"         3 1	""  	3 15 85 500 \
-			"     Messsage:"         5 1	""  	5 15 85 1000 \
-		2>&1 1>&3)
-
-		# close fd
-		exec 3>&-
-
-		# display values just entered
+			"     Messsage:"         5 1	""  	5 15 85 1000)
 		compteur=0
-		for ligne in $VALUES
-		do
-			if [ $compteur -eq 0 ]
-			then
-				utilisateurs=$ligne
-			fi
-			if [ $compteur -eq 1 ]
-			then
-				objet=$ligne
-			fi
-			if [ $compteur -eq 2 ]
-			then
-				message=$ligne
-			fi
-			compteur=$((compteur+1))
-		done
+		IFS=$'\n'
+		y=($VALUES)
+		utilisateurs=${y[0]}
+		objet=${y[1]}
+		message=${y[2]}
+		IFS=$' '
 		testNull=$(verifMessage $utilisateurs $objet $message)
 		testUser=$(verifUsers $utilisateurs)
 	done
-	envoyerMessage $utiliateurs $objet $message
+	envoyerMessage "$utilisateurs" "$objet" "$message"
 }
 
 function verifMessage {
+	res=1
 	if [ "$1" = "" ] || [ "$2" = "" ] || [ "$3" = "" ]
 	then
-		echo 1
+		echo "$res"
 	else
-		echo 0
+		res=0
+		echo "$res"
 	fi
 }
 
 function verifUsers {
 	res=1
-	IMF=" "
 	for user in $1
 	do
 		if [ $(userExist $user) -eq 0 ]
@@ -113,6 +106,5 @@ function verifUsers {
 			res=0
 		fi
 	done
-	IMF="\n"
 	echo "$res"
 }
