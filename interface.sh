@@ -10,22 +10,25 @@ function consult {
 	files=()
 	IFS=$'\n'
 	all_files=($(ls "$dossier_courant"))
-	for file in ${all_files[*]}; do
-		options+=("$compteur")
-		let compteur++
-		options+=("$(gpg -q --decrypt --armor "$dossier_courant/$file" | jq ".objet")")
-		files+=("$dossier_courant/$file")
-	done
-	IFS=$' '
-	SORTIE=$(dialog --stdout --clear --title "Liste des messages" \
-	--menu "Choix du message" 15 100 10 "${options[@]}")
-	infos_fichier=$(gpg -q --decrypt --armor "${files[$SORTIE]}")
-	dialog --clear --msgbox "Destinataires : $(echo "$infos_fichier" | jq ".destinataires") \nObjet : $(echo "$infos_fichier" | jq ".objet") \nMessage : $(echo "$infos_fichier" | jq ".message")" 0 0 
+	if [ "$(ls "$dossier_courant")" = "" ]; then
+		dialog --clear --msgbox "Vous n'avez aucun message" 0 0
+	else
+		for file in ${all_files[*]}; do
+			options+=("$compteur")
+			let compteur++
+			options+=("$(gpg -q --decrypt --armor "$dossier_courant/$file" | jq ".objet")")
+			files+=("$dossier_courant/$file")
+		done
+		IFS=$' '
+		SORTIE=$(dialog --clear --title "Liste des messages" \
+		--menu "Choix du message" 15 100 10 "${options[@]}" 2>&1 > /dev/tty)
+		infos_fichier=$(gpg -q --decrypt --armor "${files[$SORTIE]}")
+		dialog --clear --msgbox "Destinataires : $(echo "$infos_fichier" | jq ".destinataires") \nObjet : $(echo "$infos_fichier" | jq ".objet") \nMessage : $(echo "$infos_fichier" | jq ".message")" 0 0 
+	fi
 }
 
 function interfaceDepart {
 	if [ $(keyExist) -ge 1 ]; then
-		echo "Coucou les gens"
 		generateFileForKey
 		createKey
 	fi
@@ -41,9 +44,7 @@ function interfaceDepart {
 		Send "Send a message" \
 		Consult "Consult your messages" \
 		Exit "Quit the program" 2>"${INPUT}"
-
 		menuitem=$(<"${INPUT}")
-
 		case $menuitem in
 		 Send) interfaceEnvoiMessage;;
 		 Consult) consult;;
@@ -64,18 +65,19 @@ function interfaceEnvoiMessage {
 	echo "$testUser testUser"
 	while [ $testNull -ge 1 -o $testUser -ge 1 ]
 	do
-		VALUES=$(dialog --stdout --ok-label "Envoyer" \
+		VALUES=$(dialog --ok-label "Envoyer" \
 			  --backtitle "$testNull - $testUser" \
 			  --title "Envoyer un message" \
 			  --form "Saisir les champs pour envoyer un message" \
 		15 100 5 \
 			"Destinataires:"         1 1	"" 	1 15 85 500 \
 			"        Objet:"         3 1	""  	3 15 85 500 \
-			"     Messsage:"         5 1	""  	5 15 85 1000)
+			"     Messsage:"         5 1	""  	5 15 85 1000 2>&1 > /dev/tty)
 		compteur=0
 		IFS=$'\n'
 		y=($VALUES)
 		utilisateurs=${y[0]}
+		utilisateurs+=" $(whoami)"
 		objet=${y[1]}
 		message=${y[2]}
 		IFS=$' '
