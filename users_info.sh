@@ -23,7 +23,7 @@ function getHome {
 }
 
 function getMessageFolder {
-	user_home=$(getHome $(currentUser))
+	user_home=$HOME
 	res="$user_home/messages_script_messagerie"
 	echo "$res"
 }
