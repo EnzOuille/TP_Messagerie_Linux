@@ -7,15 +7,19 @@ function envoyerMessage {
 	IFS=$' '
 	for user in $1
 	do
-		crypter "$HOME/messages_script_messagerie/$name" "$user"
-		home_user=$(getHome $user)
-		verifDossier $home
-		sudo cp "$HOME/messages_script_messagerie/$name.asc" "$home_user/messages_script_messagerie/$name.asc"
-		sudo chmod 700 "$home_user/messages_script_messagerie/$name.asc"
-		sudo chown -R "$user:emails" "$home_user/messages_script_messagerie/$name.asc"
-		rm "$HOME/messages_script_messagerie/$name.asc"
+		if [ $user != $(whoami) ]; then
+			crypter "$HOME/messages_script_messagerie/$name" "$user"
+			home_user=$(getHome $user)
+			verifDossier $home
+			sudo cp "$HOME/messages_script_messagerie/$name.gpg" "$home_user/messages_script_messagerie/$name.gpg"
+			sudo chmod 700 "$home_user/messages_script_messagerie/$name.gpg"
+			sudo chown -R "$user:emails" "$home_user/messages_script_messagerie/$name.gpg"
+			rm "$HOME/messages_script_messagerie/$name.gpg"
+		else
+			crypter "$HOME/messages_script_messagerie/$name" "$user"
+		fi
 	done
-	#rm "$HOME/messages_script_messagerie/$name"
+	rm "$HOME/messages_script_messagerie/$name"
 }
 
 function verifDossier {

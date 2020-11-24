@@ -1,4 +1,3 @@
 #!/usr/bin/bash
 source interface.sh
-#interfaceDepart
 interfaceDepart

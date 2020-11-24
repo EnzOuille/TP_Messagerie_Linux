@@ -16,7 +16,7 @@ function generateFileForKey {
      %no-protection
      %commit
      %echo done"
-    #rm $HOME/generation 2> /dev/null
+    rm $HOME/generation 2> /dev/null
     echo "$file" > $HOME/generation
     echo 0
 }
@@ -26,5 +26,5 @@ function createKey {
 }
 
 function crypter {
-    gpg --armor --trust-model always -r "$2_messagerie" --encrypt "$1"
+    gpg --trust-model "always" -r "$2_messagerie" --encrypt "$1"
 }

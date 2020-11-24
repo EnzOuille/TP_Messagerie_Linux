@@ -9,15 +9,15 @@ function consult {
 	compteur=0
 	files=()
 	IFS=$'\n'
-	all_files=($(ls "$dossier_courant"))
-	if [ "$(ls "$dossier_courant")" = "" ]; then
+	all_files=($(find "$dossier_courant" . -name "*.gpg"))
+	if [ "$(find "$dossier_courant" . -name "*.gpg")" = "" ]; then
 		dialog --clear --msgbox "Vous n'avez aucun message" 0 0
 	else
 		for file in ${all_files[*]}; do
 			options+=("$compteur")
 			let compteur++
-			options+=("$(gpg -q --decrypt --armor "$dossier_courant/$file" | jq ".objet")")
-			files+=("$dossier_courant/$file")
+			options+=("$(gpg -q --decrypt --armor "$file" | jq ".objet")")
+			files+=("$file")
 		done
 		IFS=$' '
 		SORTIE=$(dialog --clear --title "Liste des messages" \
