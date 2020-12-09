@@ -28,3 +28,16 @@ function createKey {
 function crypter {
     gpg --trust-model "always" -r "$2_messagerie" --encrypt "$1"
 }
+
+function archiverFichiers {
+    dossier_courant=$(getMessageFolder)
+    IFS=$'\n'
+    all_files=$(ls $dossier_courant/*.gpg 2>/dev/null)
+    current=$(date +%s);
+    for file in ${all_files[*]}; do
+        last_modified=$(stat -c "%Y" $file);
+        if [ $((current - last_modified)) -gt 86400 ]; then
+            gzip $file
+        fi
+    done
+}
